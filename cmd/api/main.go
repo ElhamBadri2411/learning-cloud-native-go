@@ -2,22 +2,18 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
+	"myapp/api/router"
 	"myapp/config"
 	"net/http"
 )
 
 func main() {
 	c := config.New()
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("/hello", hello)
-	mux.HandleFunc("/test", test)
-
+	r := router.NewRouter()
 	s := &http.Server{
 		Addr:         fmt.Sprintf(":%d", c.Server.Port),
-		Handler:      mux,
+		Handler:      r,
 		ReadTimeout:  c.Server.TimeoutRead,
 		WriteTimeout: c.Server.TimeoutWrite,
 		IdleTimeout:  c.Server.TimeoutIdle,
@@ -27,12 +23,4 @@ func main() {
 	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatal("Server startup failed")
 	}
-}
-
-func hello(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "Hello, world!")
-}
-
-func test(w http.ResponseWriter, req *http.Request) {
-	io.WriteString(w, "test")
 }
